@@ -33,7 +33,7 @@ import javax.swing.border.EmptyBorder;
 public class SortPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	private final JPanel outerPanel;
 	private final JPanel drawPanel;
 	private final JPanel buttonsPanel;
@@ -360,8 +360,7 @@ public class SortPanel extends JPanel {
 					try {
 						if (resume) {
 							Thread.sleep(sortSpeed());
-						}
-						else {
+						} else {
 							Thread.sleep(sleepTime); // After each pass the thread sleeps
 						}
 					} catch (InterruptedException e) {
@@ -374,19 +373,32 @@ public class SortPanel extends JPanel {
 				for (int i = 0; i < arraySize - 1; i++) {
 					for (int j = 0; j < (arraySize - 1 - i); j++) {
 						if (array[j] < array[j + 1]) {
-							if (!stopFlag) {
-								int tmp = array[j + 1];
-								array[j + 1] = array[j];
-								array[j] = tmp;
-								repaint(); // call repaint() any time two elements are swapped
-							} else {
-								stopFlag = false;
-								return;
+							synchronized (pauseLock) {
+								if (!stopFlag) {
+									int tmp = array[j + 1];
+									array[j + 1] = array[j];
+									array[j] = tmp;
+									if (pause) {
+										try {
+											pauseLock.wait();
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+									}
+									repaint(); // call repaint() any time two elements are swapped
+								} else {
+									stopFlag = false;
+									return;
+								}
 							}
 						}
 					}
 					try {
-						Thread.sleep(sleepTime); // After each pass the thread sleeps
+						if (resume) {
+							Thread.sleep(sortSpeed());
+						} else {
+							Thread.sleep(sleepTime); // After each pass the thread sleeps
+						}
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
