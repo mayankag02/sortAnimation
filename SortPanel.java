@@ -370,6 +370,7 @@ public class SortPanel extends JPanel {
 			}
 			// if user selected descending order
 			else {
+				start = System.currentTimeMillis();
 				for (int i = 0; i < arraySize - 1; i++) {
 					for (int j = 0; j < (arraySize - 1 - i); j++) {
 						if (array[j] < array[j + 1]) {
